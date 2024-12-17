@@ -1,0 +1,62 @@
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+import numpy as np
+import random
+import matplotlib.pyplot as plt
+
+# STEP 3: META-LEARNING APPROACH
+
+# 1. DEFINE META-LEARNING TASKS
+
+# SPLIT THE DATA INTO MULTIPLE RELATED TASKS
+task_count = 3
+tasks = []
+tasks_labels = []
+
+# DETERMINE THE NUMBER OF SAMPLES FOR EACH TASK
+samples_per_task = segments_normalized.shape[0] // task_count
+
+for _ in range(task_count):
+    # RANDOMLY SAMPLE A SUBSET OF SEGMENTS AND THEIR LABELS FOR EACH TASK
+    task_indices = random.sample(range(segments_normalized.shape[0]), samples_per_task)
+    task_segments = segments_normalized[task_indices]
+    task_segment_labels = segment_labels[task_indices]
+    
+    # Ensuring that each segment has a corresponding label
+    if len(task_segment_labels) != len(task_segments):
+        raise ValueError("Mismatch between number of segments and labels.")
+
+    tasks.append(task_segments)
+    tasks_labels.append(task_segment_labels)
+
+# 2. MODEL SELECTION
+
+# CHOOSE APPROPRIATE BASE MODELS
+base_models = {
+    'Neural Network': MLPClassifier(max_iter=500, random_state=42),
+    'Support Vector Machine': SVC(kernel='linear', random_state=42),
+    'Decision Tree': DecisionTreeClassifier(random_state=42)
+}
+
+# 3. META-LEARNING FRAMEWORK
+
+# IMPLEMENT A SIMPLE META-LEARNING FRAMEWORK (E.G., TRAIN EACH BASE MODEL ON EACH TASK)
+meta_results = {}
+
+for model_name, model in base_models.items():
+    task_accuracies = []
+    for i, (task_segments, task_labels) in enumerate(zip(tasks, tasks_labels)):
+        # RESHAPE SEGMENTS AND ENSURE LABELS MATCH THE SEGMENT SHAPE
+        num_samples = task_segments.shape[0]  # Number of samples in the task
+        task_segments_reshaped = task_segments.reshape(num_samples, -1)
+        task_labels = task_labels.flatten()  # Ensure task_labels is a 1D array
+
+        # SPLIT EACH TASK INTO TRAIN AND TEST SETS
+        X_train, X_test, y_train, y_test = train_test_split(task_segments_reshaped,
+                                                            task_labels,
+                                                            test_size=0.3,
+                                                            random_state=42)
+       
